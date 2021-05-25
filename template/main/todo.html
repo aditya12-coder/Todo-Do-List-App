@@ -1,0 +1,217 @@
+{% extends 'main/base.html' %}
+{% block title %} TODO APP {% endblock title %}
+{% load static %}
+{% block body %}
+{% load crispy_forms_tags %}
+<script>
+    $(document).ready(function() {
+    $('#table').DataTable();
+});
+</script>
+<div class="container mt-4"><button data-bs-toggle="modal" data-bs-target="#create" class="btn btn-primary">Add</button>
+
+<a href="logout/" class="btn btn-primary ">Logout</a>
+</div>
+
+<div class="container mt-4">
+    <table id="table" class="table" style="width:100%">
+        <thead>
+            <tr>
+                <th>S.no</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Created At.</th>
+                <th>Completed</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for todo in todos %}
+            <tr>
+                <td>{{forloop.counter}}</td>
+                {% if todo.is_completed == 'No' %}
+                <td>{{todo.title}}</td>
+                {% else %}
+                <td><del style="color: green !important;">{{todo.title}}</del></td>
+                {% endif %}
+                {% if todo.is_completed == 'No' %}
+                <td>{{todo.description|truncatechars:20}}</td>
+                {% else %}
+                <td><del style="color: green;">{{todo.description|truncatechars:20}}</del></td>
+                {% endif %}
+                {% if todo.is_completed == 'No' %}
+                <td>{{todo.date}}</td>
+                <td>{{todo.is_completed}}</td>
+                {% else %}
+                <td><del   style="color: green;">{{todo.date}}</del></td>
+                <td><del   style="color: green;">{{todo.is_completed}}</del></td>
+                {% endif %}
+                <td><button data-bs-toggle="modal" data-bs-target="#view{{todo.id}}" class="btn btn-primary">View</button> <button data-bs-toggle="modal" data-bs-target="#edit{{todo.id}}" class="btn btn-success">Edit</button></td>
+            </tr>
+            <div class="modal fade" id="view{{todo.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">TODO</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label">Title :</label>
+                                <div class="col-sm-10">
+                                    <p>{{todo.title}}</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row mb-3">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label">Added Date :</label>
+                                <div class="col-sm-10">
+                                    <p>{{todo.date}}</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row mb-3">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label">Description :</label>
+                                <div class="col-sm-10">
+                                    <div style="min-height: 70px;">
+                                        {{todo.description}} </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row mb-3">
+                                <label for="inputPassword3" class="col-sm-2 col-form-label">Completed :</label>
+                                <div class="col-sm-10">
+                                    <p class="text-muted">{{todo.is_completed}}</p>
+                                </div>
+                            </div>
+                            <hr>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="edit{{todo.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">Update TODO</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="todo/{{todo.id}}/edit" class="row g-3 needs-validation" novalidate>
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label  class="form-label">Title</label>
+                                    <input type="text"  class="form-control" value="{{todo.title}}" name="title_edited" required>
+                                    <div class="invalid-feedback">
+                                        Please Enter a Title
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea name="description_edited"  class="form-control" required>{{todo.description}}</textarea>
+                                    <div class="invalid-feedback">
+                                        Please Enter Description
+                                    </div>
+                                </div>
+								  <div class="col-12 mb-3">
+								    <div class="form-group">
+								    	<label class="form-label">Completed</label>
+								      <select name="is_completed" class="form-input" >
+								      	{%  if todo.is_completed == 'No' %}
+								      	<option value="No">No</option>
+								      	<option value="Yes">Yes</option>
+								      	{% else %}
+								      	<option value="Yes">Yes</option>
+								      	<option value="No">No</option> 	
+								      	{% endif  %}
+								      </select>
+								    </div>
+								  </div>
+                                <div class="col-12">
+                                    <button class="btn btn-primary" type="submit">Update</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <a class="btn btn-danger" href="todo/{{todo.id}}/delete">Delete Todo</a>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="create" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Add TODO</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" class="row g-3 needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Title</label>
+                        <input type="text" class="form-control" name="title" required>
+                        <div class="invalid-feedback">
+                            Please Enter a Title
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea name="description" class="form-control" required></textarea>
+                        <div class="invalid-feedback">
+                            Please Enter Description
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" type="submit">Add</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<style type="text/css">
+.table {
+    margin: 0 auto;
+    width: 80%;
+}
+
+div.dataTables_wrapper div.dataTables_filter input {
+    box-shadow: none !important;
+}
+</style>
+<script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+    'use strict'
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms)
+        .forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+</script>
+{% endblock %}

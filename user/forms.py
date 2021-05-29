@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
-from django.contrib.auth.views import  LogoutView
+
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(label='First name', max_length=14)

@@ -3,7 +3,7 @@
  
  To use this Project follow these step
 <li>pip install virtualenv</li>
-<li>git clone https://github.com/aditya12-coder/Todo-Do-List-App.git</li>
+<li>git clone https://github.com/adityapandey217/Todo-Do-List-App.git</li>
 <li> cd Todo-Do-List-App</li>
 <li> virtualenv venv</li>
 <li>venv\Scripts\activate</li>
